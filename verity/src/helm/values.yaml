@@ -1,10 +1,11 @@
 deployment:
-  image: "177276529591.dkr.ecr.us-west-2.amazonaws.com/verity"
-  tag: "latest"
+  name: "iac-cas"
+  image: "609723053065.dkr.ecr.ap-southeast-1.amazonaws.com/iac-verity-cas"
+  tag: "veritymainplusconf"
   imagePullPolicy: "Always"
   containerPort: 9000
   vault:
-    enable: true
+    enable: false
   terminationGracePeriodSeconds: 120
   probes:
     startup:
@@ -27,12 +28,18 @@ k8sService:
   port: 80
   targetPort: 9000
 ingress:
-  force_ssl: false
-  healthcheckPath: "/verity/node/readiness"
-  healthcheckIntervalSeconds: 5
-  healthcheckTimeoutSeconds: 2
-  unhealthyThresholdCount: 2
-  deregistrationDelay: 120
+  # force_ssl: false
+  # healthcheckPath: "/verity/node/readiness"
+  # healthcheckIntervalSeconds: 5
+  # healthcheckTimeoutSeconds: 2
+  # unhealthyThresholdCount: 2
+  # deregistrationDelay: 120
+  targetGroupARNarn: "arn:aws:elasticloadbalancing:ap-southeast-1:609723053065:targetgroup/iac-cas/bf2b04271c90f846" #TODO: make external
+serviceAccount:
+  name: "kubernetes-external-secrets"
+  arn: "arn:aws:iam::609723053065:role/iac-external-secrets" #TODO: make external
+secrets:
+  awsSecretsNameCredentialsTf: "iac/app/cas/credentials-tf" #TODO: make external
 # List of sponsors for Verity
 sponsors:
 # List configuration for TAA.
