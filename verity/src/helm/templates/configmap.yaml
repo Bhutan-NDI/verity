@@ -78,17 +78,304 @@ data:
       }
     }
     {{- end }}
+#   sponsors.conf: |
+#     {{- if .Values.sponsors }}
+#     {
+#       "verity": {
+#         "provisioning": {
+#           "sponsors":
+# {{ toPrettyJson .Values.sponsors | indent 10 }}
+#         }
+#       }
+#     }
+#     {{- end }}
   sponsors.conf: |
-    {{- if .Values.sponsors }}
-    {
-      "verity": {
-        "provisioning": {
-          "sponsors":
-{{ toPrettyJson .Values.sponsors | indent 10 }}
+    akka {
+      stdout-loglevel = "OFF"
+      loglevel = "WARNING"
+
+      persistence {
+        journal {
+          plugin = "verity.dynamodb-journal"
+        }
+
+        snapshot-store {
+          plugin = "verity.dynamodb-snapshot-store"
         }
       }
+
+      management.http {
+        enabled = true
+        hostname = "127.0.0.1"
+        port = 8558
+        port = ${?VERITY_AKKA_MANAGEMENT_HTTP_PORT}
+      }
+
+      actor {
+        serialize-messages = off
+        allow-java-serialization = off
+      }
+
+      remote {
+        artery.canonical {
+          hostname = "localhost"
+          port = 2550
+          port = ${?VERITY_AKKA_REMOTE_PORT}
+        }
+      }
+
+      cluster {
+
+        seed-nodes = [
+          "akka://verity@localhost:"${akka.remote.artery.canonical.port}
+          ${?VERITY_AKKA_CLUSTER_SEED_NODES_1}    # this is used to run cluster locally
+          ${?VERITY_AKKA_CLUSTER_SEED_NODES_2}    # this is used to run cluster locally
+        ]
+      }
+
+      coordinated-shutdown.phases {
+        before-service-unbind {
+          //draining period (before it continues service-unbind phase of the coordinated shutdown)
+          timeout = 0 s
+        }
+      }
+      sharding-region-name {
+        user-agent = "ConsumerAgent"
+        user-agent-pairwise = "ConsumerAgentPairwise"
+      }
     }
-    {{- end }}
+
+    verity {
+
+      dynamodb-common {
+        # The service endpoint to connect to for the DynamoDB instance that
+        # shall be used. Please refer to the AWS documentation for details.
+        endpoint = "dynamodb.ap-southeast-1.amazonaws.com" # or where your deployment is
+        endpoint = ${?DYNAMODB_ENDPOINT}
+
+        # The logical journal name, used in the partition keys.
+        journal-name = "agency_event"
+
+        # The AWS key ID to use for connecting to the specified endpoint.
+        # Will only be used if aws-secret-access-key is also set.
+        #
+        # It is recommended to leave this (and the aws-secret-access-key) setting
+        # empty in order to use the default credentials provider chain, see
+        # http://docs.aws.amazon.com/AWSSdkDocsJava/latest/DeveloperGuide/credentials.html#using-the-default-credential-provider-chain
+        aws-access-key-id = ""
+        aws-access-key-id = ${?DYNAMODB_ACCESS_KEY_ID}
+
+        # The AWS secret to use in conjuction with the AWS key ID.
+        # Will only be used if aws-access-key-id is also set.
+        #
+        # It is recommended to leave this (and the aws-access-key-id) setting
+        # empty in order to use the default credentials provider chain, see
+        # http://docs.aws.amazon.com/AWSSdkDocsJava/latest/DeveloperGuide/credentials.html#using-the-default-credential-provider-chain
+        aws-secret-access-key = ""
+        aws-secret-access-key = ${?DYNSMODB_SECRET_KEY}
+
+        dispatcher {
+          type = Dispatcher
+          executor = "fork-join-executor"
+          fork-join-executor {
+            parallelism-min = 2
+            parallelism-max = 8
+          }
+        }
+
+        # AWS client configuration settings, see
+        # http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/?com/amazonaws/ClientConfiguration.html
+        #
+        # (setting any of these to the string "default" means that the corresponding
+        # setter method on the ClientConfiguration will not be invoked)
+        aws-client-config {
+          client-execution-timeout = default     # int
+          connection-max-idle-millis = default   # long
+          connection-timeout = default           # int
+          connection-ttl = default               # long
+          local-address = default                # InetAddress
+          max-connections = default              # int
+          max-error-retry = default              # int
+          preemptive-basic-proxy-auth = default  # boolean
+          protocol = HTTP                     # HTTP or HTTPS
+          proxy-domain = default                 # string
+          proxy-host = default                   # string
+          proxy-password = default               # string
+          proxy-port = default                   # int
+          proxy-username = default               # string
+          proxy-workstation = default            # string
+          request-timeout = default              # int
+          response-metadata-cache-size = default # int
+          signer-override = default              # string
+          socket-buffer-size-hints = default     # [ int, int ] (for send & receive)
+          socket-timeout = default               # int
+          use-expect-continue = default          # boolean
+          use-gzip = default                     # boolean
+          use-reaper = default                   # boolean
+          use-tcp-keepalive = default            # boolean
+          user-agent = default                   # string
+        }
+
+        # If this is set to `on` then every DynamoDB request will be logged
+        # at DEBUG level. Caution: this will generate A LOT of output.
+        tracing = off
+
+        # AWS API limits - DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING
+        aws-api-limits {
+          max-batch-get = 100
+          max-batch-write = 25
+          max-item-size = 400000
+        }
+
+      }
+
+      dynamodb-journal {
+
+        # The service endpoint to connect to for the DynamoDB instance that
+        # shall be used. Please refer to the AWS documentation for details.
+        endpoint = ${verity.dynamodb-common.endpoint}
+
+        # The logical journal name, used in the partition keys.
+        journal-name = ${verity.dynamodb-common.journal-name}
+
+        # The AWS key ID to use for connecting to the specified endpoint.
+        aws-access-key-id = ${verity.dynamodb-common.aws-access-key-id}
+
+        # The AWS secret to use in conjuction with the AWS key ID.
+        aws-secret-access-key = ${verity.dynamodb-common.aws-secret-access-key}
+
+        aws-client-config = ${verity.dynamodb-common.aws-client-config}
+
+        # AWS API limits - DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING
+        aws-api-limits = ${verity.dynamodb-common.aws-api-limits}
+
+        # If this is set to `on` then every DynamoDB request will be logged
+        # at DEBUG level. Caution: this will generate A LOT of output.
+        tracing = ${verity.dynamodb-common.tracing}
+
+        # The FQCN for the journal plugin implementation - DO NOT CHANGE
+        class = "akka.persistence.dynamodb.journal.DynamoDBJournal"
+
+        # The dispatcher that executes the replay logic for this plugin
+        # instance - should not normally need to be changed.
+        replay-dispatcher = "akka.persistence.dispatchers.default-replay-dispatcher"
+
+        # The dispatcher that executes the write logic for this plugin
+        # instance - should not normally need to be changed.
+        plugin-dispatcher = "dynamodb-journal.dispatcher"
+
+        # The number of shards to distribute the sequence number items over.
+        sequence-shards = 10
+
+        # number of concurrently running replay prefetch operations for a
+        # single PersistentActor; this prefetch means that during a replay
+        # more events might be retrieved than specified with the `max`
+        # parameter, with corresponding usage DynamoDB read units
+        replay-parallelism = 10
+
+        # Set to `on` to log the detected configuration at INFO level at plugin startup.
+        log-config = off
+
+        # The dispatcher that executes the future combinators needed for
+        # transforming the AmazonDynamoDBAsyncClient results (i.e.
+        # handling the back-off etc.)
+        client-dispatcher = "dynamodb-journal.dispatcher"
+
+        # The logical journal name, used in the partition keys.
+        journal-table = "agency_akka_cas"
+        journal-table = ${?VERITY_DYNAMODB_JOURNAL_TABLE}
+
+      }
+
+      dynamodb-snapshot-store {
+
+        # The service endpoint to connect to for the DynamoDB instance that
+        # shall be used. Please refer to the AWS documentation for details.
+        endpoint = ${verity.dynamodb-common.endpoint}
+
+        # The logical journal name, used in the partition keys.
+        journal-name = ${verity.dynamodb-common.journal-name}
+
+        # The AWS key ID to use for connecting to the specified endpoint.
+        aws-access-key-id = ${verity.dynamodb-common.aws-access-key-id}
+
+        # The AWS secret to use in conjuction with the AWS key ID.
+        aws-secret-access-key = ${verity.dynamodb-common.aws-secret-access-key}
+
+        aws-client-config = ${verity.dynamodb-common.aws-client-config}
+
+        # AWS API limits - DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING
+        aws-api-limits = ${verity.dynamodb-common.aws-api-limits}
+
+        # If this is set to `on` then every DynamoDB request will be logged
+        # at DEBUG level. Caution: this will generate A LOT of output.
+        tracing = ${verity.dynamodb-common.tracing}
+
+        # The dispatcher that executes the future combinators needed for
+        # transforming the AmazonDynamoDBAsyncClient results (i.e.
+        # handling the back-off etc.)
+        client-dispatcher = "dynamodb-journal.dispatcher"
+
+        class = "akka.persistence.dynamodb.snapshot.DynamoDBSnapshotStore"
+
+        # The name of the DynamoDB table to be used for this plugin instance
+        snapshot-table = "agency_akka_snapshot_cas"
+        snapshot-table = ${?VERITY_DYNAMODB_SNAPSHOT_TABLE}
+
+      }
+    }
+
+    verity {
+      lib-vdrtools {
+        ledger {
+          indy {
+            transaction_author_agreement = {
+              enabled = false
+              enabled = ${?LIB_INDY_LEDGER_TAA_ENABLED}  //environment variable if set, override above value
+
+              agreements = {
+                  "1.0.0" {
+                    digest = "a0ab0aada7582d4d211bf9355f36482e5cb33eeb46502a71e6cc7fea57bb8305"
+                    mechanism = "on_file"
+                    time-of-acceptance = ${?TAA_ACCEPT_DATE}
+                  }
+                  "2.0" {
+                      digest = "8cee5d7a573e4893b08ff53a0761a22a1607df3b3fcd7e75b98696c92879641f"
+                      mechanism = "on_file"
+                      time-of-acceptance = ${?TAA_ACCEPT_DATE}
+                  }
+              }
+            }
+            # ledger pool transaction file location
+            genesis-txn-file-location = ${?GENESIS_TXN_FILE_LOCATION}  //environment variable if set, override above value
+          }
+        }
+        wallet {
+          # this value is provided to libindy's create wallet api by which it knows which type of wallet we want to use
+          # for now, it only supports "default" and "mysql"
+          type = "mysql"
+        }
+      }
+      vdr: {
+        multi-ledger-support-enabled = true
+        unqualified-ledger-prefix = "did:indy:sovrin"
+        ledgers: [
+          {
+            type = "indy"
+            namespaces = ["indy:sovrin"]
+            genesis-txn-file-location = "/var/lib/indy/genesis.txt"
+
+            transaction-author-agreement: {
+              text: "TAA for sandbox ledger"
+              version: "1.0.0"
+              digest: "a0ab0aada7582d4d211bf9355f36482e5cb33eeb46502a71e6cc7fea57bb8305"
+              time-of-acceptance: "2019-12-04"
+              mechanism: "on_file"
+            }
+          }
+        ]
+      }
+    }
   metrics.conf: |
     {{- if .Values.tracking }}
     {
@@ -155,31 +442,31 @@ data:
 
       <turboFilter class="com.evernym.verity.IgnoreLoggerFilter" />
     </configuration>
-  ledgers.conf: |
-    {{- if .Values.taa }}
-    verity.lib-vdrtools.ledger.indy.transaction_author_agreement.agreements = {
-      {{- range .Values.taa }}
-      "{{ .version }}" {
-          "digest" = "{{ .digest }}"
-          "mechanism" = "{{ .mechanism }}"
-          "time-of-acceptance" = "{{ .timeOfAcceptance }}"
-      }
-      {{- end }}
-    }
-    #THIS IS ADDED FOR BACKWARDS COMPATIBILITY, REMOVE AFTER VDR DEPLOY IS DONE
-    #BEGIN VDR BACKWARD COMPAT
-    verity.lib-indy.ledger.transaction_author_agreement.agreements = {
-      {{- range .Values.taa }}
-      "{{ .version }}" {
-          "digest" = "{{ .digest }}"
-          "mechanism" = "{{ .mechanism }}"
-          "time-of-acceptance" = "{{ .timeOfAcceptance }}"
-      }
-      {{- end }}
-    }
-    #END VDR BACKWARD COMPATIBILITY
-    {{- end }}
-  vdr.conf: |
+  # ledgers.conf: |
+  #   {{- if .Values.taa }}
+  #   verity.lib-vdrtools.ledger.indy.transaction_author_agreement.agreements = {
+  #     {{- range .Values.taa }}
+  #     "{{ .version }}" {
+  #         "digest" = "{{ .digest }}"
+  #         "mechanism" = "{{ .mechanism }}"
+  #         "time-of-acceptance" = "{{ .timeOfAcceptance }}"
+  #     }
+  #     {{- end }}
+  #   }
+  #   #THIS IS ADDED FOR BACKWARDS COMPATIBILITY, REMOVE AFTER VDR DEPLOY IS DONE
+  #   #BEGIN VDR BACKWARD COMPAT
+  #   verity.lib-indy.ledger.transaction_author_agreement.agreements = {
+  #     {{- range .Values.taa }}
+  #     "{{ .version }}" {
+  #         "digest" = "{{ .digest }}"
+  #         "mechanism" = "{{ .mechanism }}"
+  #         "time-of-acceptance" = "{{ .timeOfAcceptance }}"
+  #     }
+  #     {{- end }}
+  #   }
+  #   #END VDR BACKWARD COMPATIBILITY
+  #   {{- end }}
+  vdrQWERTY.conf: |
     {{- if .Values.vdr }}
     {
     "verity": {

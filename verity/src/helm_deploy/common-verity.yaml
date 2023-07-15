@@ -15,11 +15,10 @@ vdr:
   ledgers: [
     {
       type: "indy",
-      namespaces: ["sovrin", "indy:sovrin"],
+      namespaces: ["indy:sovrin"],
       genesis-txn-file-location: "/var/lib/indy/genesis.txt",
       transaction-author-agreement: {
-        enabled: false,
-        digest: 8cee5d7a573e4893b08ff53a0761a22a1607df3b3fcd7e75b98696c92879641f,
+        digest: a0ab0aada7582d4d211bf9355f36482e5cb33eeb46502a71e6cc7fea57bb8305,
         mechanism: on_file,
         time-of-acceptance: "2019-12-04"
       }
@@ -130,3 +129,6 @@ vars:
   VERITY__SECRET__URL_MAPPER_ACTOR: "klsd89894kdsjisdji4"
   VERITY__SECRET__USER_BLOCKING_STATUS_MNGR: "ki4krudsj2iek"
   VERITY__SECRET__USER_WARNING_STATUS_MNGR: "jh3jqtcri1hdj"
+
+  VERITY_DYNAMODB_JOURNAL_TABLE: "iac-cas-journal"
+  VERITY_DYNAMODB_SNAPSHOT_TABLE: "iac-cas-snapshot"
