@@ -91,30 +91,6 @@ data:
 #     {{- end }}
   sponsors.conf: |
     akka {
-      stdout-loglevel = "OFF"
-      loglevel = "WARNING"
-
-      persistence {
-        journal {
-          plugin = "verity.dynamodb-journal"
-        }
-
-        snapshot-store {
-          plugin = "verity.dynamodb-snapshot-store"
-        }
-      }
-
-      management.http {
-        enabled = true
-        hostname = "127.0.0.1"
-        port = 8558
-        port = ${?VERITY_AKKA_MANAGEMENT_HTTP_PORT}
-      }
-
-      actor {
-        serialize-messages = off
-        allow-java-serialization = off
-      }
 
       remote {
         artery.canonical {
@@ -133,16 +109,6 @@ data:
         ]
       }
 
-      coordinated-shutdown.phases {
-        before-service-unbind {
-          //draining period (before it continues service-unbind phase of the coordinated shutdown)
-          timeout = 0 s
-        }
-      }
-      sharding-region-name {
-        user-agent = "ConsumerAgent"
-        user-agent-pairwise = "ConsumerAgentPairwise"
-      }
     }
   metrics.conf: |
     {{- if .Values.tracking }}
