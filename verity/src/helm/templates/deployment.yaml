@@ -52,11 +52,11 @@ spec:
         # args: ["3600"]
         resources:
           requests:
-            memory: 768Mi
-            cpu: 250m
+            memory: {{ .Values.deployment.resources.requests.memory }}
+            cpu: {{ .Values.deployment.resources.requests.cpu }}
           limits:
-            memory: 1024Mi
-            cpu: 1000m
+            memory: {{ .Values.deployment.resources.limits.memory }}
+            cpu: {{ .Values.deployment.resources.limits.cpu }}
         startupProbe:
           httpGet:
             path: {{ .Values.deployment.probes.startup.path }}
