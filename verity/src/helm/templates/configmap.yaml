@@ -90,26 +90,7 @@ data:
 #     }
 #     {{- end }}
   sponsors.conf: |
-    akka {
 
-      remote {
-        artery.canonical {
-          hostname = "localhost"
-          port = 2550
-          port = ${?VERITY_AKKA_REMOTE_PORT}
-        }
-      }
-
-      cluster {
-
-        seed-nodes = [
-          "akka://verity@localhost:"${akka.remote.artery.canonical.port}
-          ${?VERITY_AKKA_CLUSTER_SEED_NODES_1}    # this is used to run cluster locally
-          ${?VERITY_AKKA_CLUSTER_SEED_NODES_2}    # this is used to run cluster locally
-        ]
-      }
-
-    }
   metrics.conf: |
     {{- if .Values.tracking }}
     {
