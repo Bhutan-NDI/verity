@@ -78,19 +78,17 @@ data:
       }
     }
     {{- end }}
-#   sponsors.conf: |
-#     {{- if .Values.sponsors }}
-#     {
-#       "verity": {
-#         "provisioning": {
-#           "sponsors":
-# {{ toPrettyJson .Values.sponsors | indent 10 }}
-#         }
-#       }
-#     }
-#     {{- end }}
   sponsors.conf: |
-
+    {{- if .Values.sponsors }}
+    {
+      "verity": {
+        "provisioning": {
+          "sponsors":
+{{ toPrettyJson .Values.sponsors | indent 10 }}
+        }
+      }
+    }
+    {{- end }}
   metrics.conf: |
     {{- if .Values.tracking }}
     {
