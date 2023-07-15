@@ -1,7 +1,7 @@
 deployment:
   name: "iac-cas"
   image: "609723053065.dkr.ecr.ap-southeast-1.amazonaws.com/iac-verity-cas"
-  tag: "veritymainplusconf"
+  tag: "veritymainplusconf1"
   imagePullPolicy: "Always"
   containerPort: 9000
   vault:
@@ -39,7 +39,7 @@ serviceAccount:
   name: "kubernetes-external-secrets"
   arn: "arn:aws:iam::609723053065:role/iac-external-secrets" #TODO: make external
 secrets:
-  awsSecretsNameCredentialsTf: "iac/app/cas/credentials-tf" #TODO: make external
+  awsSecretsNameCredentialsTf: "iac/app/cas-2/credentials-tf" #TODO: make external
 # List of sponsors for Verity
 sponsors:
 # List configuration for TAA.
