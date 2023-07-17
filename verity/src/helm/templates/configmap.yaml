@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: vars-{{ template "verity.fullname" . }}
+  name: vars-{{ .Values.deployment.name }}
   labels:
     tags.datadoghq.com/service: {{ .Values.service }}
     tags.datadoghq.com/env: {{ .Values.env }}
@@ -11,7 +11,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: file-{{ template "verity.fullname" . }}
+  name: file-{{ .Values.deployment.name }}
   labels:
     tags.datadoghq.com/service: {{ .Values.service }}
     tags.datadoghq.com/env: {{ .Values.env }}
@@ -157,6 +157,7 @@ data:
     </configuration>
   ledgers.conf: |
     {{- if .Values.taa }}
+    verity.lib-vdrtools.ledger.indy.transaction_author_agreement.enabled = false #TODO disabled to let application to start
     verity.lib-vdrtools.ledger.indy.transaction_author_agreement.agreements = {
       {{- range .Values.taa }}
       "{{ .version }}" {
@@ -194,7 +195,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ledger-genesis-{{ template "verity.fullname" . }}
+  name: ledger-genesis-{{ .Values.deployment.name }}
   labels:
     tags.datadoghq.com/service: {{ .Values.service }}
     tags.datadoghq.com/env: {{ .Values.env }}

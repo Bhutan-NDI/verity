@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "verity.fullname" . }}
+  name: {{ .Values.deployment.name }}
   labels:
     tags.datadoghq.com/service: {{ .Values.service }} # TODO ???
     tags.datadoghq.com/env: {{ .Values.env }} # TODO ??
@@ -14,12 +14,12 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: {{ template "verity.fullname" . }}
+      app: {{ .Values.deployment.name }}
   replicas: {{ .Values.startReplicas }}
   template:
     metadata:
       labels:
-        app: {{ template "verity.fullname" . }}
+        app: {{ .Values.deployment.name }}
         revision: {{ .Release.Revision | quote }}
         actorSystemName: verity
         tags.datadoghq.com/service: {{ .Values.service }} # TODO ???
@@ -47,7 +47,6 @@ spec:
         vault.hashicorp.com/agent-inject-template-app-confluent: |
 {{ include "verity.vaultInjectTemplate" (dict "Secret" $app_confluent) | indent 10 }}
         {{- end }}
-
     spec:
       # TODO parametrize afifnity better
       # FIXME why affinity ???
@@ -68,20 +67,22 @@ spec:
         whenUnsatisfiable: DoNotSchedule
         labelSelector:
           matchLabels:
-            app: {{ template "verity.fullname" . }}
+            app: {{ .Values.deployment.name }}
             revision: {{ .Release.Revision | quote }}
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: DoNotSchedule
         labelSelector:
           matchLabels:
-            app: {{ template "verity.fullname" . }}
+            app: {{ .Values.deployment.name }}
             revision: {{ .Release.Revision | quote }}
       terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
-      - name: {{ template "verity.fullname" . }}
+      - name: {{ .Values.deployment.name }}
         image: {{ .Values.deployment.image }}:{{ .Values.deployment.tag }}
+        # command: ["sleep"]
+        # args: ["3600"]
         resources:
           requests:
             memory: {{ .Values.deployment.resources.requests.memory }}
@@ -112,7 +113,7 @@ spec:
           failureThreshold: {{ .Values.deployment.probes.liveness.failureThreshold }}
         envFrom:
         - configMapRef:
-            name: vars-{{ template "verity.fullname" . }}
+            name: vars-{{ .Values.deployment.name }}
         env:
         - name: CINNAMON__CHMETRICS__DATADOG_REPORTER__HOST
           valueFrom:
@@ -155,17 +156,17 @@ spec:
             secretProviderClass: aws-secrets-{{ template "verity.fullname" . }}
       - name: config-files
         configMap:
-          name: file-{{ template "verity.fullname" . }}
+          name: file-{{ .Values.deployment.name }}
       - name: ledger-genesis-files
         configMap:
-          name: ledger-genesis-{{ template "verity.fullname" . }}
+          name: ledger-genesis-{{ .Values.deployment.name }}
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ template "verity.fullname" . }}
+  name: {{ .Values.deployment.name }}
 spec:
   maxUnavailable: 1
   selector:
     matchLabels:
-      app: {{ template "verity.fullname" . }}
+      app: {{ .Values.deployment.name }}

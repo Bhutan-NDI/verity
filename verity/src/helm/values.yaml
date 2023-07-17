@@ -1,6 +1,8 @@
 deployment:
   image: "609723053065.dkr.ecr.ap-southeast-1.amazonaws.com/dev-cas" # FIXME non-prefixed image for both cas and vas
+  # image: "609723053065.dkr.ecr.ap-southeast-1.amazonaws.com/iac-verity-cas"
   tag: "latest"
+  #tag: "veritymainplusconf1"
   imagePullPolicy: "IfNotPresent" # TODO legacy Always
   containerPort: 9001 # TODO legacy 9000
   vault:
@@ -42,15 +44,13 @@ ingress:
   healthcheckTimeoutSeconds: 2
   unhealthyThresholdCount: 2
   deregistrationDelay: 120
-  # targetGroupARNarn: "arn:aws:elasticloadbalancing:ap-southeast-1:609723053065:targetgroup/iac-cas/bf2b04271c90f846" #TODO: make external
-  targetGroupARNarn: ""
+  targetGroupARNarn: "arn:aws:elasticloadbalancing:ap-southeast-1:609723053065:targetgroup/iac-cas/bf2b04271c90f846" #TODO: make external
 serviceAccount:
   name: "kubernetes-external-secrets"
   # arn: "arn:aws:iam::609723053065:role/iac-external-secrets" #TODO: make external
   arn: ""
 secrets:
-  # awsSecretsNameCredentialsTf: "iac/app/cas/credentials-tf" #TODO: make external
-  awsSecretsNameCredentialsTf: ""
+  awsSecretsNameCredentialsTf: "iac/app/cas-2/credentials-tf" #TODO: make external
 
 # TODO don't we need sponsors, taa, vdr ???
 # List of sponsors for Verity
