@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.deployment.name }}
+  name: {{ template "verity.fullname" . }}
   labels:
-    app: {{ .Values.deployment.name }}
-    tags.datadoghq.com/service: {{ .Values.deployment.name }}
-    tags.datadoghq.com/env: dev
+    tags.datadoghq.com/service: {{ .Values.service }} # TODO ???
+    tags.datadoghq.com/env: {{ .Values.env }} # TODO ??
+    app: {{ template "verity.fullname" . }} # TODO review
 spec:
   strategy:
     type: RollingUpdate
@@ -14,16 +14,16 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: {{ .Values.deployment.name }}
+      app: {{ template "verity.fullname" . }}
   replicas: {{ .Values.startReplicas }}
   template:
     metadata:
       labels:
-        app: {{ .Values.deployment.name }}
+        app: {{ template "verity.fullname" . }}
         revision: {{ .Release.Revision | quote }}
         actorSystemName: verity
-        tags.datadoghq.com/service: {{ .Values.deployment.name }}
-        tags.datadoghq.com/env: dev
+        tags.datadoghq.com/service: {{ .Values.service }} # TODO ???
+        tags.datadoghq.com/env: {{ .Values.env }} # TODO ??
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "9095"
@@ -50,6 +50,7 @@ spec:
 
     spec:
       # TODO parametrize afifnity better
+      # FIXME why affinity ???
       {{- if .Values.metrics.prometheus }}
       affinity:
         nodeAffinity:
@@ -59,7 +60,7 @@ spec:
               - key: app
                 operator: In
                 values:
-                - {{ .Values.deployment.name }} 
+                - {{ template "verity.fullname" . }} 
       {{- end }}
       topologySpreadConstraints:
       - maxSkew: 1
@@ -67,27 +68,27 @@ spec:
         whenUnsatisfiable: DoNotSchedule
         labelSelector:
           matchLabels:
-            app: {{ .Values.deployment.name }}
+            app: {{ template "verity.fullname" . }}
             revision: {{ .Release.Revision | quote }}
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: DoNotSchedule
         labelSelector:
           matchLabels:
-            app: {{ .Values.deployment.name }}
+            app: {{ template "verity.fullname" . }}
             revision: {{ .Release.Revision | quote }}
       terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
-      - name: {{ .Values.deployment.name }}
+      - name: {{ template "verity.fullname" . }}
         image: {{ .Values.deployment.image }}:{{ .Values.deployment.tag }}
         resources:
           requests:
-            memory: 768Mi
-            cpu: 250m
+            memory: {{ .Values.deployment.resources.requests.memory }}
+            cpu: {{ .Values.deployment.resources.requests.cpu }}
           limits:
-            memory: 1024Mi
-            cpu: 1000m
+            memory: {{ .Values.deployment.resources.limits.memory }}
+            cpu: {{ .Values.deployment.resources.limits.cpu }}
         startupProbe:
           httpGet:
             path: {{ .Values.deployment.probes.startup.path }}
@@ -111,7 +112,7 @@ spec:
           failureThreshold: {{ .Values.deployment.probes.liveness.failureThreshold }}
         envFrom:
         - configMapRef:
-            name: vars-{{ .Values.deployment.name }}
+            name: vars-{{ template "verity.fullname" . }}
         env:
         - name: CINNAMON__CHMETRICS__DATADOG_REPORTER__HOST
           valueFrom:
@@ -151,20 +152,20 @@ spec:
           driver: secrets-store.csi.k8s.io
           readOnly: true
           volumeAttributes:
-            secretProviderClass: aws-secrets-{{ .Values.deployment.name }}
+            secretProviderClass: aws-secrets-{{ template "verity.fullname" . }}
       - name: config-files
         configMap:
-          name: file-{{ .Values.deployment.name }}
+          name: file-{{ template "verity.fullname" . }}
       - name: ledger-genesis-files
         configMap:
-          name: ledger-genesis-{{ .Values.deployment.name }}
+          name: ledger-genesis-{{ template "verity.fullname" . }}
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ .Values.deployment.name }}
+  name: {{ template "verity.fullname" . }}
 spec:
   maxUnavailable: 1
   selector:
     matchLabels:
-      app: {{ .Values.deployment.name }}
+      app: {{ template "verity.fullname" . }}
