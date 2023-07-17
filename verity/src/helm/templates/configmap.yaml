@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: vars-{{ .Values.deployment.name }}
+  name: vars-{{ template "verity.fullname" . }}
   labels:
     tags.datadoghq.com/service: {{ .Values.service }}
     tags.datadoghq.com/env: {{ .Values.env }}
@@ -11,7 +11,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: file-{{ .Values.deployment.name }}
+  name: file-{{ template "verity.fullname" . }}
   labels:
     tags.datadoghq.com/service: {{ .Values.service }}
     tags.datadoghq.com/env: {{ .Values.env }}
@@ -195,7 +195,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ledger-genesis-{{ .Values.deployment.name }}
+  name: ledger-genesis-{{ template "verity.fullname" . }}
   labels:
     tags.datadoghq.com/service: {{ .Values.service }}
     tags.datadoghq.com/env: {{ .Values.env }}

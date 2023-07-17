@@ -5,7 +5,7 @@ metadata:
 spec:
   type: {{ .Values.k8sService.type }}
   selector:
-    app: {{ .Values.deployment.name }}
+    app: {{ template "verity.fullname" . }}
   ports:
     - port: {{ .Values.k8sService.port }}
       targetPort: {{ .Values.k8sService.targetPort }}
