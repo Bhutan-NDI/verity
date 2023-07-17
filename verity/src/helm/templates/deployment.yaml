@@ -49,8 +49,8 @@ spec:
         {{- end }}
     spec:
       # TODO parametrize afifnity better
-      # FIXME why affinity ???
-      {{- if .Values.metrics.prometheus }}
+      # FIXME why affinity might be needed ???
+      {{- if .Values.deployment.useAffinity }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
