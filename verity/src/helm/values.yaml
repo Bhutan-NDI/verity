@@ -4,7 +4,7 @@ deployment:
   tag: "latest"
   #tag: "veritymainplusconf1"
   imagePullPolicy: "IfNotPresent" # TODO legacy Always
-  containerPort: 9001 # TODO legacy 9000
+  containerPort: 9000
   vault:
     enable: false
   terminationGracePeriodSeconds: 120
@@ -35,7 +35,7 @@ deployment:
 k8sService:
   type: NodePort
   port: 80
-  targetPort: 9001 # TODO legacy 9000
+  targetPort: 9000
 ingress:
   enabled: false
   force_ssl: false
