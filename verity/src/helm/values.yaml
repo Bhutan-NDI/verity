@@ -1,11 +1,9 @@
 deployment:
   service:
   env:
-  image: "609723053065.dkr.ecr.ap-southeast-1.amazonaws.com/dev-cas" # FIXME non-prefixed image for both cas and vas
-  # image: "609723053065.dkr.ecr.ap-southeast-1.amazonaws.com/iac-verity-cas"
-  tag: "latest"
-  #tag: "veritymainplusconf1"
-  imagePullPolicy: "IfNotPresent" # TODO legacy Always
+  image: "609723053065.dkr.ecr.ap-southeast-1.amazonaws.com/verity"
+  tag: "latest" # FIXME use versioned one
+  imagePullPolicy: "Always" # FIXME use IfNotPresent once versioned tag is set
   containerPort: 9000
   vault:
     enable: false
@@ -26,7 +24,7 @@ deployment:
       periodSeconds: 5
       timeoutSeconds: 2
       failureThreshold: 2
-  resources: # TODO why these values
+  resources: # TODO tune the values
     requests:
       memory: 768Mi
       cpu: 250m
@@ -46,13 +44,11 @@ ingress:
   healthcheckTimeoutSeconds: 2
   unhealthyThresholdCount: 2
   deregistrationDelay: 120
-  targetGroupARNarn: "arn:aws:elasticloadbalancing:ap-southeast-1:609723053065:targetgroup/iac-cas/bf2b04271c90f846" #TODO: make external
+  targetGroupARNarn: ""
 serviceAccount:
-  name: "kubernetes-external-secrets"
-  # arn: "arn:aws:iam::609723053065:role/iac-external-secrets" #TODO: make external
   arn: ""
 secrets:
-  awsSecretsNameCredentialsTf: "iac/app/cas-2/credentials-tf" #TODO: make external
+  awsSecretsNameCredentialsTf: ""
 
 # TODO don't we need sponsors, taa, vdr ???
 # List of sponsors for Verity
@@ -62,7 +58,7 @@ secrets:
 # VDR configuration
 #vdr:
 
-vars: {} # TODO not declared in legacy
+vars: {}
 
 # Custom and Adhoc Configuration for Verity in HOCON Notation
 # Intended to allow quick injection of config that is
