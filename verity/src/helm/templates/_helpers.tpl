@@ -56,11 +56,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the service account to use
 */}}
 {{- define "verity.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "verity.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
+{{- include "verity.fullname" . }}
 {{- end }}
 
 {{/*
@@ -72,4 +68,28 @@ Vault injection template
   export {{ $k }}='{{ $v }}'
 {{ end }}
 {{- end }}`}}
+{{- end }}
+
+{{/*
+Vault annotations template
+*/}}
+{{- define "verity.vaultAnnotationsTemplate" -}}
+{{- $credentials := printf "kubernetes_secrets/eks-%s/%s-%s" .Values.gitlab_env .Values.name .Values.service }}
+{{- $credentials_tf := printf "kubernetes_secrets/eks-%s/%s-%s-tf" .Values.gitlab_env .Values.name .Values.service }}
+{{- $app_confluent := printf "kubernetes_secrets/eks-%s/%s/app-confluent" .Values.gitlab_env .Values.name }}
+vault.hashicorp.com/agent-inject: "true"
+vault.hashicorp.com/role: "k8s-eks-{{ coalesce .Values.vault_auth_role .Values.env }}"
+vault.hashicorp.com/auth-path: "auth/k8s/eks-{{ coalesce .Values.vault_auth_path .Values.gitlab_env }}"
+vault.hashicorp.com/agent-inject-secret-credentials: "{{ $credentials }}"
+vault.hashicorp.com/agent-inject-secret-credentials-tf: "{{ $credentials_tf }}"
+vault.hashicorp.com/agent-inject-secret-app-confluent: "{{ $app_confluent }}"
+vault.hashicorp.com/tls-secret: vault-tls-secret
+vault.hashicorp.com/ca-cert: /vault/tls/evernym-root-ca.crt
+vault.hashicorp.com/agent-pre-populate-only : "true"
+vault.hashicorp.com/agent-inject-template-credentials: |
+{{ include "verity.vaultInjectTemplate" (dict "Secret" $credentials) | indent 2 }}
+vault.hashicorp.com/agent-inject-template-credentials-tf: |
+{{ include "verity.vaultInjectTemplate" (dict "Secret" $credentials_tf) | indent 2 }}
+vault.hashicorp.com/agent-inject-template-app-confluent: |
+{{ include "verity.vaultInjectTemplate" (dict "Secret" $app_confluent) | indent 2 }}
 {{- end }}

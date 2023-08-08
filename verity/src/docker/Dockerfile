@@ -20,6 +20,7 @@ RUN curl https://gitlab.com/evernym/verity/vdr-tools/-/package_files/27311920/do
     && rm -f libvdrtools_0.8.4-bionic_amd64.deb
 
 
+# TODO
 # copy verity-application-assembly.jar and kanela-agent.jar from jars folder into the container
 # COPY jars/*.jar /usr/lib/verity-application/ FIXME
 

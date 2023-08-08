@@ -1,4 +1,6 @@
 deployment:
+  service:
+  env:
   image: "609723053065.dkr.ecr.ap-southeast-1.amazonaws.com/dev-cas" # FIXME non-prefixed image for both cas and vas
   # image: "609723053065.dkr.ecr.ap-southeast-1.amazonaws.com/iac-verity-cas"
   tag: "latest"
