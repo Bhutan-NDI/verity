@@ -24,12 +24,10 @@ spec:
         actorSystemName: verity
         tags.datadoghq.com/service: {{ .Values.service }} # TODO ???
         tags.datadoghq.com/env: {{ .Values.env }} # TODO ??
+      {{- if .Values.deployment.vault.enable }}
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9095"
-        {{- if .Values.deployment.vault.enable }}
-          {{ include "verity.vaultAnnotationsTemplate" . }}
-        {{- end }}
+        {{ include "verity.vaultAnnotations" . | indent 8 }}
+      {{- end }}
     spec:
       # TODO parametrize afifnity better
       # FIXME why affinity might be needed ???

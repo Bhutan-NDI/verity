@@ -73,7 +73,7 @@ Vault injection template
 {{/*
 Vault annotations template
 */}}
-{{- define "verity.vaultAnnotationsTemplate" -}}
+{{- define "verity.vaultAnnotations" -}}
 {{- $credentials := printf "kubernetes_secrets/eks-%s/%s-%s" .Values.gitlab_env .Values.name .Values.service }}
 {{- $credentials_tf := printf "kubernetes_secrets/eks-%s/%s-%s-tf" .Values.gitlab_env .Values.name .Values.service }}
 {{- $app_confluent := printf "kubernetes_secrets/eks-%s/%s/app-confluent" .Values.gitlab_env .Values.name }}
