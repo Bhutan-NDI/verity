@@ -2,8 +2,6 @@
 # instanceLabelOverride: verity
 
 deployment:
-  service:
-  env:
   image: "609723053065.dkr.ecr.ap-southeast-1.amazonaws.com/verity"
   tag: "latest" # FIXME use versioned one
   imagePullPolicy: "Always" # FIXME use IfNotPresent once versioned tag is set
@@ -40,7 +38,7 @@ k8sService:
   port: 80
   targetPort: 9000
 ingress:
-  # if empty internal ingress configuration is used
+  # if empty - internal ingress is used
   targetGroupARNarn: ""
   # internal ingress configuration
   force_ssl: false
@@ -57,13 +55,12 @@ secrets:
   # name/alias of the secret in AWS SecretsManager to put into credentials-tf.json
   awsSecretsNameCredentialsTf: ""
 
-# TODO don't we need sponsors, taa, vdr ???
 # List of sponsors for Verity
-#sponsors:
+sponsors:
 # List configuration for TAA.
-#taa:
+taa:
 # VDR configuration
-#vdr:
+vdr:
 
 # application configuraion variables
 vars: {}
