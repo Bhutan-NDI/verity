@@ -24,6 +24,13 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 {{- end -}}
 
+{{/*
+Allow customization of the instance label value.
+*/}}
+{{- define "verity.instance-name" -}}
+{{- default (printf "%s-%s" .Release.Name .Release.Namespace) .Values.instanceLabelOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 
 {{/*
 Create chart name and version as used by the chart label.
@@ -36,21 +43,22 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "verity.labels" -}}
-helm.sh/chart: {{ include "verity.chart" . }}
 {{ include "verity.selectorLabels" . }}
+helm.sh/chart: {{ template "verity.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- if .Values.version }}
 app.kubernetes.io/version: {{ .Values.version | quote }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
 Selector labels
 */}}
 {{- define "verity.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "verity.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/name: {{ template "verity.name" . }}
+app.kubernetes.io/instance: {{ template "verity.instance-name" . }}
 {{- end }}
+
 
 {{/*
 Create the name of the service account to use

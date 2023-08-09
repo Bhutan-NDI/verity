@@ -3,9 +3,9 @@ kind: Deployment
 metadata:
   name: {{ template "verity.fullname" . }}
   labels:
+    {{- include "verity.labels" . | nindent 4 }}
     tags.datadoghq.com/service: {{ .Values.service }}
     tags.datadoghq.com/env: {{ .Values.env }}
-    app: {{ template "verity.fullname" . }} # TODO review
 spec:
   strategy:
     type: RollingUpdate
@@ -14,12 +14,12 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: {{ template "verity.fullname" . }}
+      {{- include "verity.selectorLabels" . | nindent 6 }}
   replicas: {{ .Values.startReplicas }}
   template:
     metadata:
       labels:
-        app: {{ template "verity.fullname" . }}
+        {{- include "verity.labels" . | nindent 8 }}
         revision: {{ .Release.Revision | quote }}
         actorSystemName: verity
         tags.datadoghq.com/service: {{ .Values.service }} # TODO ???
@@ -37,10 +37,14 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: app
+              - key: app.kubernetes.io/name
                 operator: In
                 values:
-                - {{ template "verity.fullname" . }} 
+                - {{ template "verity.name" . }}
+            # - key: app.kubernetes.io/instance
+            #   operator: In
+            #   values:
+            #   - {{ template "verity.instance-name" . }}
       {{- end }}
       topologySpreadConstraints:
       - maxSkew: 1
@@ -48,14 +52,14 @@ spec:
         whenUnsatisfiable: DoNotSchedule
         labelSelector:
           matchLabels:
-            app: {{ template "verity.fullname" . }}
+            {{- include "verity.selectorLabels" . | nindent 12 }}
             revision: {{ .Release.Revision | quote }}
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: DoNotSchedule
         labelSelector:
           matchLabels:
-            app: {{ template "verity.fullname" . }}
+            {{- include "verity.selectorLabels" . | nindent 12 }}
             revision: {{ .Release.Revision | quote }}
       terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
       serviceAccountName: {{ template "verity.serviceAccountName" . }}
@@ -150,4 +154,4 @@ spec:
   maxUnavailable: 1
   selector:
     matchLabels:
-      app: {{ template "verity.fullname" . }}
+      {{- include "verity.selectorLabels" . | nindent 6 }}

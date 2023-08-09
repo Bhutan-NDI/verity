@@ -1,3 +1,6 @@
+## This will override the default app.kubernetes.io/instance label for all Objects.
+# instanceLabelOverride: verity
+
 deployment:
   service:
   env:
@@ -37,14 +40,15 @@ k8sService:
   port: 80
   targetPort: 9000
 ingress:
-  enabled: false
+  # if empty internal ingress configuration is used
+  targetGroupARNarn: "123"
+  # internal ingress configuration
   force_ssl: false
   healthcheckPath: "/verity/node/readiness"
   healthcheckIntervalSeconds: 5
   healthcheckTimeoutSeconds: 2
   unhealthyThresholdCount: 2
   deregistrationDelay: 120
-  targetGroupARNarn: ""
 serviceAccount:
   arn: ""
 secrets:

@@ -5,7 +5,7 @@ metadata:
 spec:
   type: {{ .Values.k8sService.type }}
   selector:
-    app: {{ template "verity.fullname" . }}
+    {{- include "verity.selectorLabels" . | nindent 4 }}
   ports:
     - port: {{ .Values.k8sService.port }}
       targetPort: {{ .Values.k8sService.targetPort }}
