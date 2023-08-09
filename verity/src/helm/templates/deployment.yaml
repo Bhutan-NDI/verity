@@ -66,8 +66,6 @@ spec:
       containers:
       - name: {{ template "verity.fullname" . }}
         image: {{ .Values.deployment.image }}:{{ .Values.deployment.tag }}
-        # command: ["sleep"]
-        # args: ["3600"]
         resources:
           requests:
             memory: {{ .Values.deployment.resources.requests.memory }}

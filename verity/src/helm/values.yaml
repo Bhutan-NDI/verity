@@ -41,7 +41,7 @@ k8sService:
   targetPort: 9000
 ingress:
   # if empty internal ingress configuration is used
-  targetGroupARNarn: "123"
+  targetGroupARNarn: ""
   # internal ingress configuration
   force_ssl: false
   healthcheckPath: "/verity/node/readiness"
@@ -49,9 +49,12 @@ ingress:
   healthcheckTimeoutSeconds: 2
   unhealthyThresholdCount: 2
   deregistrationDelay: 120
-serviceAccount:
-  arn: ""
+
+# role arn to use for EKS service account
+secretsRoleArn: ""
+
 secrets:
+  # name/alias of the secret in AWS SecretsManager to put into credentials-tf.json
   awsSecretsNameCredentialsTf: ""
 
 # TODO don't we need sponsors, taa, vdr ???
@@ -62,6 +65,7 @@ secrets:
 # VDR configuration
 #vdr:
 
+# application configuraion variables
 vars: {}
 
 # Custom and Adhoc Configuration for Verity in HOCON Notation
