@@ -59,6 +59,13 @@ app.kubernetes.io/name: {{ template "verity.name" . }}
 app.kubernetes.io/instance: {{ template "verity.instance-name" . }}
 {{- end }}
 
+{{/*
+DataDog labels
+*/}}
+{{- define "verity.datadogLabels" -}}
+tags.datadoghq.com/service: {{ .Values.service | quote }}
+tags.datadoghq.com/env: {{ .Values.env | quote }}
+{{- end }}
 
 {{/*
 Create the name of the service account to use

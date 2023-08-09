@@ -4,8 +4,7 @@ metadata:
   name: {{ template "verity.fullname" . }}
   labels:
     {{- include "verity.labels" . | nindent 4 }}
-    tags.datadoghq.com/service: {{ .Values.service }}
-    tags.datadoghq.com/env: {{ .Values.env }}
+    {{- include "verity.datadogLabels" . | nindent 4 }}
 spec:
   type: {{ .Values.k8sService.type }}
   selector:

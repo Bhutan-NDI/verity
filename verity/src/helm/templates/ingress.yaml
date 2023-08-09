@@ -4,8 +4,7 @@ kind: Ingress
 metadata:
   name: {{ template "verity.fullname" . }}
   labels:
-    tags.datadoghq.com/service: {{ .Values.service }}
-    tags.datadoghq.com/env: {{ .Values.env }}
+    {{- include "verity.datadogLabels" . | nindent 4 }}
   annotations:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/target-type: ip

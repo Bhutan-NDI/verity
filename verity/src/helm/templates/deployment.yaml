@@ -4,8 +4,7 @@ metadata:
   name: {{ template "verity.fullname" . }}
   labels:
     {{- include "verity.labels" . | nindent 4 }}
-    tags.datadoghq.com/service: {{ .Values.service }}
-    tags.datadoghq.com/env: {{ .Values.env }}
+    {{- include "verity.datadogLabels" . | nindent 4 }}
 spec:
   strategy:
     type: RollingUpdate
@@ -22,8 +21,7 @@ spec:
         {{- include "verity.labels" . | nindent 8 }}
         revision: {{ .Release.Revision | quote }}
         actorSystemName: verity
-        tags.datadoghq.com/service: {{ .Values.service }} # TODO ???
-        tags.datadoghq.com/env: {{ .Values.env }} # TODO ??
+        {{- include "verity.datadogLabels" . | nindent 8 }}
       {{- if .Values.deployment.vault.enable }}
       annotations:
         {{ include "verity.vaultAnnotations" . | indent 8 }}
