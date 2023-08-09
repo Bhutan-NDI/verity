@@ -1,11 +1,5 @@
 FROM ubuntu:18.04
 
-ARG VERITY_VERSION
-ENV VERITY_VERSION=${VERITY_VERSION:-2.19.0.0}
-
-ARG VDRTOOLS_VERSION
-ENV VDRTOOLS_VERSION=${VDRTOOLS_VERSION:-0.8.6}
-
 WORKDIR /root
 
 RUN apt-get update && \
@@ -22,11 +16,15 @@ RUN apt-get update && \
 # Set JAVA_HOME (use value for defualt-jdk in Ubuntu 18)
 ENV JAVA_HOME /usr/lib/jvm/java-1.11.0-openjdk-amd64/
 
-# Downolad vdr-tools debian package from the github releases
-RUN curl -L https://github.com/Bhutan-NDI/verity/releases/download/v${VERITY_VERSION}/libvdrtools_${VDRTOOLS_VERSION}-bionic_amd64.deb --output libvdrtools.deb
+ARG VERITY_VERSION
+ENV VERITY_VERSION=${VERITY_VERSION:-2.19.0.0}
 
-# Install the vdr-tools then remove debian package
-RUN dpkg -i libvdrtools.deb && rm libvdrtools.deb
+ARG VDRTOOLS_VERSION
+ENV VDRTOOLS_VERSION=${VDRTOOLS_VERSION:-0.8.6}
+
+# Install the vdr-tools debian package from the github releases
+RUN curl -L https://github.com/Bhutan-NDI/verity/releases/download/v${VERITY_VERSION}/libvdrtools_${VDRTOOLS_VERSION}-bionic_amd64.deb --output libvdrtools.deb \
+    && dpkg -i libvdrtools.deb && rm libvdrtools.deb
 
 # copy verity-application-assembly.jar and kanela-agent.jar from jars folder into the container
 ADD jars/*.jar /usr/lib/verity-application/
