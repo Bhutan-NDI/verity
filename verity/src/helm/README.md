@@ -1,5 +1,13 @@
 # Verity k8s Deploy
 
+## Test
+
+Locally:
+
+```shell
+helm template .
+```
+
 ## Publish
 
 ```shell
