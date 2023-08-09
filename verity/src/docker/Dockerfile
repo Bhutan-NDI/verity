@@ -28,7 +28,7 @@ RUN curl -L https://github.com/Bhutan-NDI/verity/releases/download/v${VERITY_VER
     && rm libvdrtools.deb
 
 # copy verity-application-assembly.jar and kanela-agent.jar from jars folder into the container
-COPY jars/*.jar /usr/lib/verity-application/ FIXME
+COPY jars/*.jar /usr/lib/verity-application/
 
 # copy static Verity configuration files
 COPY configuration/* /etc/verity/verity-application/
