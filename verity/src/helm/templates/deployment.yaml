@@ -104,13 +104,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        # The Kubernetes API discovery will use this service name to look for
-        # nodes with this value in the 'app' label.
-        - name: AKKA_CLUSTER_BOOTSTRAP_SERVICE_NAME
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: "metadata.labels['app']"
         volumeMounts:
         - name: secrets-store-inline
           mountPath: "/vault/secrets"
