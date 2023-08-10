@@ -33,10 +33,12 @@ deployment:
       memory: 1024Mi
       cpu: 1000m
   useAffinity: false # TODO requires better configuraton
+
 k8sService:
   type: NodePort
   port: 80
   targetPort: 9000
+
 ingress:
   # if empty - internal ingress is used
   targetGroupARNarn: ""

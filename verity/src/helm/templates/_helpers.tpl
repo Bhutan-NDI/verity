@@ -40,6 +40,13 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{/*
+Service name of the instance
+*/}}
+{{- define "verity.service" -}}
+{{- default (include "verity.instance-name" .) .Values.service | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
 Common labels
 */}}
 {{- define "verity.labels" -}}
@@ -63,7 +70,7 @@ app.kubernetes.io/instance: {{ template "verity.instance-name" . }}
 DataDog labels
 */}}
 {{- define "verity.datadogLabels" -}}
-tags.datadoghq.com/service: {{ .Values.service | quote }}
+tags.datadoghq.com/service: {{ include "verity.service" . | quote }}
 tags.datadoghq.com/env: {{ .Values.env | quote }}
 {{- end }}
 
@@ -89,8 +96,8 @@ Vault injection template
 Vault annotations template
 */}}
 {{- define "verity.vaultAnnotations" -}}
-{{- $credentials := printf "kubernetes_secrets/eks-%s/%s-%s" .Values.gitlab_env .Values.name .Values.service }}
-{{- $credentials_tf := printf "kubernetes_secrets/eks-%s/%s-%s-tf" .Values.gitlab_env .Values.name .Values.service }}
+{{- $credentials := printf "kubernetes_secrets/eks-%s/%s-%s" .Values.gitlab_env .Values.name (include "verity.service" .) }}
+{{- $credentials_tf := printf "kubernetes_secrets/eks-%s/%s-%s-tf" .Values.gitlab_env .Values.name (include "verity.service" .) }}
 {{- $app_confluent := printf "kubernetes_secrets/eks-%s/%s/app-confluent" .Values.gitlab_env .Values.name }}
 vault.hashicorp.com/agent-inject: "true"
 vault.hashicorp.com/role: "k8s-eks-{{ coalesce .Values.vault_auth_role .Values.env }}"
