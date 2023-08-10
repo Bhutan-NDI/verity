@@ -28,7 +28,7 @@ spec:
       {{- end }}
     spec:
       # TODO parametrize afifnity better
-      # FIXME why affinity might be needed ???
+      # TODO why affinity might be needed ???
       {{- if .Values.deployment.useAffinity }}
       affinity:
         nodeAffinity:

@@ -3,8 +3,8 @@
 
 deployment:
   image: "609723053065.dkr.ecr.ap-southeast-1.amazonaws.com/verity"
-  tag: "latest" # FIXME use versioned one
-  imagePullPolicy: "Always" # FIXME use IfNotPresent once versioned tag is set
+  tag: "0.0.1"
+  imagePullPolicy: "IfNotPresent"
   containerPort: 9000
   vault:
     enable: false
