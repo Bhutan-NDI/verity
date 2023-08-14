@@ -22,6 +22,9 @@ spec:
         revision: {{ .Release.Revision | quote }}
         actorSystemName: verity
         {{- include "verity.datadogLabels" . | nindent 8 }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9095" # default value defined in verity/src/main/resources/reference.conf
     spec:
       topologySpreadConstraints:
       - maxSkew: 1
