@@ -51,6 +51,7 @@ Common labels
 */}}
 {{- define "verity.labels" -}}
 {{ include "verity.selectorLabels" . }}
+{{ include "verity.akkaLabels" . }}
 helm.sh/chart: {{ template "verity.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- if .Values.version }}
@@ -64,6 +65,13 @@ Selector labels
 {{- define "verity.selectorLabels" -}}
 app.kubernetes.io/name: {{ template "verity.name" . }}
 app.kubernetes.io/instance: {{ template "verity.instance-name" . }}
+{{- end }}
+
+{{/*
+Akka labels
+*/}}
+{{- define "verity.akkaLabels" -}}
+app: {{ template "verity.fullname" . }}
 {{- end }}
 
 {{/*
