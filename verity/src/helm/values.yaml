@@ -6,8 +6,6 @@ deployment:
   tag: "0.0.1"
   imagePullPolicy: "IfNotPresent"
   containerPort: 9000
-  vault:
-    enable: false
   terminationGracePeriodSeconds: 120
   probes:
     startup:

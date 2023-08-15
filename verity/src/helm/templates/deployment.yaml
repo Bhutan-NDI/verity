@@ -22,10 +22,6 @@ spec:
         revision: {{ .Release.Revision | quote }}
         actorSystemName: verity
         {{- include "verity.datadogLabels" . | nindent 8 }}
-      {{- if .Values.deployment.vault.enable }}
-      annotations:
-        {{ include "verity.vaultAnnotations" . | indent 8 }}
-      {{- end }}
     spec:
       # TODO parametrize afifnity better
       # TODO why affinity might be needed ???
