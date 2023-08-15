@@ -23,23 +23,6 @@ spec:
         actorSystemName: verity
         {{- include "verity.datadogLabels" . | nindent 8 }}
     spec:
-      # TODO parametrize afifnity better
-      # TODO why affinity might be needed ???
-      {{- if .Values.deployment.useAffinity }}
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values:
-                - {{ template "verity.name" . }}
-            # - key: app.kubernetes.io/instance
-            #   operator: In
-            #   values:
-            #   - {{ template "verity.instance-name" . }}
-      {{- end }}
       topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: topology.kubernetes.io/zone

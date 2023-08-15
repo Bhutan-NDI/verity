@@ -23,14 +23,6 @@ deployment:
       periodSeconds: 5
       timeoutSeconds: 2
       failureThreshold: 2
-  resources: # TODO tune the values
-    requests:
-      memory: 768Mi
-      cpu: 250m
-    limits:
-      memory: 1024Mi
-      cpu: 1000m
-  useAffinity: false # TODO requires better configuraton
 
 k8sService:
   type: NodePort
@@ -48,10 +40,12 @@ ingress:
   unhealthyThresholdCount: 2
   deregistrationDelay: 120
 
+# REQUIRED
 # role arn to use for EKS service account
 secretsRoleArn: ""
 
 secrets:
+  # REQUIRED
   # name/alias of the secret in AWS SecretsManager to put into credentials-tf.json
   awsSecretsNameCredentialsTf: ""
 
