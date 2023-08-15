@@ -49,6 +49,10 @@ secrets:
   # name/alias of the secret in AWS SecretsManager to put into credentials-tf.json
   awsSecretsNameCredentialsTf: ""
 
+  # REQUIRED
+  # name/alias of the secret in AWS SecretsManager to put into credentials.json
+  awsSecretsNameCredentials: ""
+
 # List of sponsors for Verity
 sponsors:
 # List configuration for TAA.
