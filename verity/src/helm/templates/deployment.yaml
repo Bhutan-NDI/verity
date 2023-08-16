@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   name: {{ template "verity.fullname" . }}
   labels:
-    tags.datadoghq.com/service: {{ .Values.service }}
-    tags.datadoghq.com/env: {{ .Values.env }}
+    {{- include "verity.labels" . | nindent 4 }}
+    {{- include "verity.datadogLabels" . | nindent 4 }}
 spec:
   strategy:
     type: RollingUpdate
@@ -13,16 +13,15 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: {{ template "verity.fullname" . }}
+      {{- include "verity.selectorLabels" . | nindent 6 }}
   replicas: {{ .Values.startReplicas }}
   template:
     metadata:
       labels:
-        app: {{ template "verity.fullname" . }}
+        {{- include "verity.labels" . | nindent 8 }}
         revision: {{ .Release.Revision | quote }}
         actorSystemName: verity
-        tags.datadoghq.com/service: {{ .Values.service }}
-        tags.datadoghq.com/env: {{ .Values.env }}
+        {{- include "verity.datadogLabels" . | nindent 8 }}
     spec:
       topologySpreadConstraints:
       - maxSkew: 1
@@ -30,14 +29,14 @@ spec:
         whenUnsatisfiable: DoNotSchedule
         labelSelector:
           matchLabels:
-            app: {{ template "verity.fullname" . }}
+            {{- include "verity.selectorLabels" . | nindent 12 }}
             revision: {{ .Release.Revision | quote }}
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: DoNotSchedule
         labelSelector:
           matchLabels:
-            app: {{ template "verity.fullname" . }}
+            {{- include "verity.selectorLabels" . | nindent 12 }}
             revision: {{ .Release.Revision | quote }}
       terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
       serviceAccountName: {{ template "verity.serviceAccountName" . }}
@@ -84,6 +83,11 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        - name: AKKA__MANAGEMENT__CLUSTER__BOOTSTRAP__CONTACT_POINT_DISCOVERY__SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: "metadata.labels['app']"
         volumeMounts:
         - name: secrets-store-inline
           mountPath: "/vault/secrets"
@@ -123,4 +127,4 @@ spec:
   maxUnavailable: 1
   selector:
     matchLabels:
-      app: {{ template "verity.fullname" . }}
+      {{- include "verity.selectorLabels" . | nindent 6 }}

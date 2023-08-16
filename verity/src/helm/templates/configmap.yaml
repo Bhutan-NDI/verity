@@ -3,8 +3,7 @@ kind: ConfigMap
 metadata:
   name: vars-{{ template "verity.fullname" . }}
   labels:
-    tags.datadoghq.com/service: {{ .Values.service }}
-    tags.datadoghq.com/env: {{ .Values.env }}
+    {{- include "verity.datadogLabels" . | nindent 4 }}
 data:
 {{ toYaml .Values.vars | indent 2 }}
 ---
@@ -13,8 +12,7 @@ kind: ConfigMap
 metadata:
   name: file-{{ template "verity.fullname" . }}
   labels:
-    tags.datadoghq.com/service: {{ .Values.service }}
-    tags.datadoghq.com/env: {{ .Values.env }}
+    {{- include "verity.datadogLabels" . | nindent 4 }}
 data:
   customers.conf: |
     {{- if .Values.customers }}
@@ -197,7 +195,6 @@ kind: ConfigMap
 metadata:
   name: ledger-genesis-{{ template "verity.fullname" . }}
   labels:
-    tags.datadoghq.com/service: {{ .Values.service }}
-    tags.datadoghq.com/env: {{ .Values.env }}
+    {{- include "verity.datadogLabels" . | nindent 4 }}
 data:
 {{ index .Values "ledger-genesis" | toPrettyJson | indent 2 }}

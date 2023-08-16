@@ -2,8 +2,8 @@ FROM ubuntu:18.04
 
 WORKDIR /root
 
-RUN apt-get update && \
-    apt-get install -y \
+RUN apt-get update \
+    && apt-get install -y \
         apt-transport-https \
         curl \
         default-jdk \
@@ -11,7 +11,7 @@ RUN apt-get update && \
         libzmq3-dev \
         libsodium23 \
         libssl1.1 \
-        && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 # Set JAVA_HOME (use value for defualt-jdk in Ubuntu 18)
 ENV JAVA_HOME /usr/lib/jvm/java-1.11.0-openjdk-amd64/
@@ -24,17 +24,18 @@ ENV VDRTOOLS_VERSION=${VDRTOOLS_VERSION:-0.8.6}
 
 # Install the vdr-tools debian package from the github releases
 RUN curl -L https://github.com/Bhutan-NDI/verity/releases/download/v${VERITY_VERSION}/libvdrtools_${VDRTOOLS_VERSION}-bionic_amd64.deb --output libvdrtools.deb \
-    && dpkg -i libvdrtools.deb && rm libvdrtools.deb
+    && dpkg -i libvdrtools.deb \
+    && rm libvdrtools.deb
 
 # copy verity-application-assembly.jar and kanela-agent.jar from jars folder into the container
-ADD jars/*.jar /usr/lib/verity-application/
+COPY jars/*.jar /usr/lib/verity-application/
 
 # copy static Verity configuration files
-ADD configuration/* /etc/verity/verity-application/
+COPY configuration/* /etc/verity/verity-application/
 
 # Add scripts
-ADD scripts/json_to_config.py /usr/local/bin/json_to_config.py
-ADD scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY scripts/json_to_config.py /usr/local/bin/json_to_config.py
+COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 CMD [ "/usr/local/bin/entrypoint.sh" ]
 

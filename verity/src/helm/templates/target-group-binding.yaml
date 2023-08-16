@@ -1,3 +1,4 @@
+{{- if .Values.ingress.targetGroupARNarn -}}
 apiVersion: elbv2.k8s.aws/v1beta1
 kind: TargetGroupBinding
 metadata:
@@ -7,3 +8,4 @@ spec:
     name: {{ template "verity.fullname" . }}
     port: {{ .Values.k8sService.port }}
   targetGroupARN: {{ .Values.ingress.targetGroupARNarn }}
+{{- end -}}
