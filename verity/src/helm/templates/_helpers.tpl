@@ -86,5 +86,5 @@ tags.datadoghq.com/env: {{ .Values.env | quote }}
 Create the name of the service account to use
 */}}
 {{- define "verity.serviceAccountName" -}}
-{{- include "verity.fullname" . }}
+{{- default (include "verity.fullname" .) .Values.serviceAccount.name }}
 {{- end }}

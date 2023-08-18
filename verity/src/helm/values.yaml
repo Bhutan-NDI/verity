@@ -24,6 +24,17 @@ deployment:
       timeoutSeconds: 2
       failureThreshold: 2
 
+resources: {}
+  # requests:
+  #   memory: 768Mi
+  #   cpu: 250m
+  # limits:
+  #   memory: 1024Mi
+  #   cpu: 1000m
+
+serviceAccount:
+  name: ""
+
 k8sService:
   type: NodePort
   port: 80
